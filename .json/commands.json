@@ -1,0 +1,17 @@
+{
+  "help": {
+    "definition": "Print all commands and definitions.",
+    "params": [],
+    "optionalParams": []
+  },
+  "input": {
+    "definition": "Create an input template.",
+    "params": ["File name"],
+    "optionalParams": []
+  },
+  "run": {
+    "definition": "Get all solutions using multilayer perceptron.",
+    "params": ["Input file path"],
+    "optionalParams": ["Alpha value", "Max error value"]
+  }
+}

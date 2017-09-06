@@ -1,0 +1,15 @@
+# Override this file with your input values. You can delete the comments, but
+# it is important to only left the table lines without a "#" at the beginning.
+
+# Fill the input table following the example, where:
+# - n: number of inputs
+# - m: number of outputs
+# - r: number of known results
+
+# It is important to put a space between values and keep the "|" as a separator
+# between inputs and desired outputs (separating with spaces too). Inputs should
+# be binary values (0, 1).
+
+x(0,0) ... x(n,0) | d(0,0) ... d(m,0)
+...    ... ...    | ...    ... ...
+x(0,r) ... x(n,r) | d(0,r) ... d(m,r)
