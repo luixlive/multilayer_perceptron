@@ -6,6 +6,16 @@ from json import loads
 from shutil import copyfile
 from multilayer_perceptron import multilayerPerceptron
 
+# Capture dynamic parameters
+def getDynamicParameters(parameters):
+  parametersDict = dict()
+  for k, v in [p.split('=') if '=' in p else [p, True] for p in parameters]:
+    if k[0] == '-':
+      parametersDict[k[1:]] = v
+    else:
+      print 'ERROR: Wrong param ' + k
+  return parametersDict
+
 # Print all commands in output
 def showHelp(commands):
   print
@@ -57,33 +67,41 @@ def readInputFile(inputFilePath):
 
 # Main function, receives the input arguments and determines the code to run
 def main(argv):
-  if len(argv) == 0 or argv[0] == '--help':
+  if len(argv) == 0:
+    argv.append('--help')
+
+  command = argv[0]
+  parameters = dict()
+  if len(argv) > 1:
+    parameters = getDynamicParameters(argv[1:])
+
+  if command == '--help':
     commands_file = open('.json/commands.json', 'r')
     commands = loads(commands_file.read())
     commands_file.close()
 
     showHelp(commands)
-  elif argv[0] == '--input':
-    if len(argv) >= 2:
-      generateInputFile(argv[1])
+  elif command == '--input':
+    if 'f' in parameters:
+      generateInputFile(parameters['f'])
     else:
-      print '--input needs 1 parameter for the generated input file\'s name'
-  elif argv[0] == '--run':
-    if len(argv) < 2:
-      print '--run needs 1 parameter for the input file\'s name'
+      print '--input needs parameter -f for the generated input file\'s name'
+  elif command == '--run':
+    if 'i' not in parameters:
+      print '--run needs parameter -i for the input file\'s name'
     else:
       constants_file = open('.json/constants.json', 'r')
       constants = loads(constants_file.read())
       constants_file.close()
 
-      (x, d, x2) = readInputFile(argv[1])
+      (x, d, x2) = readInputFile(parameters['i'])
 
       alpha = constants['alpha']
       maxError = constants['maxError']
-      if len(argv) > 2:
-        alpha = float(argv[2])
-      if len(argv) > 3:
-        maxError = float(argv[3])
+      if 'a' in parameters:
+        alpha = float(parameters['a'])
+      if 'm' in parameters:
+        maxError = float(parameters['m'])
       print
       print '\n'.join(multilayerPerceptron(x, d, x2, alpha, maxError, True))
       print

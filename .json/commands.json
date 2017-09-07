@@ -6,12 +6,15 @@
   },
   "input": {
     "definition": "Create an input template.",
-    "params": ["File name"],
+    "params": ["-f: File name"],
     "optionalParams": []
   },
   "run": {
     "definition": "Get all solutions using multilayer perceptron.",
-    "params": ["Input file path"],
-    "optionalParams": ["Alpha value", "Max error value"]
+    "params": ["-i: Input file path"],
+    "optionalParams": [
+      "-a: Alpha value (0.3)",
+      "-m: Max error value (0.00001)"
+    ]
   }
 }
