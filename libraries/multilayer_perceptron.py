@@ -57,6 +57,11 @@ def getY(yh, wo, l, m):
 
 # Calculate the correct weigths to pass all learning patterns
 def learningProcess(x, d, wh, wo, n, l, m, alpha, maxError):
+  n = len(x[0])
+  m = len(d[0])
+  l = n * m
+  (wh, wo) = generateRandomWeights(n, l, m)
+
   error = True
   while error:
     error = False
@@ -71,7 +76,7 @@ def learningProcess(x, d, wh, wo, n, l, m, alpha, maxError):
 
         error = True
 
-  return (wh, wo)
+  return (n, m, l, wh, wo)
 
 # Return the values in 'x2' and 'y2' in a string format of matrix
 def toString(x2, y2):
@@ -79,17 +84,6 @@ def toString(x2, y2):
     ' | ' + ' '.join([str(v) for v in r]) for p, r in zip(range(len(x2)), y2)]
 
 # Calculate 'y2' given 'x2', 'wh', 'wo' and all the lengths
-def getY2(x2, wh, wo, n, l, m, string):
+def getY2(x2, n, m, l, wh, wo, string = False):
   y2 = [getY(getYh(x2, wh, n, p, l), wo, l, m) for p in range(len(x2))]
   return toString(x2, y2) if string else y2
-
-# Multilayer perceptron algorithm
-def multilayerPerceptron(x, d, x2, alpha, maxError, string = False):
-  n = len(x[0])
-  m = len(d[0])
-  l = n * m
-  (wh, wo) = generateRandomWeights(n, l, m)
-
-  (wh, wo) = learningProcess(x, d, wh, wo, n, l, m, alpha, maxError)
-
-  return getY2(x2, wh, wo, n, l, m, string)
