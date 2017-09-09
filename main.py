@@ -30,9 +30,17 @@ def showHelp(commands):
       ', '.join(commands[command]['optionalParams'])
   print
 
-# Copy the input template file to the path given
-def generateInputFile(name):
-  copyfile('.templates/input_file_template.txt', name)
+# Copy the template file to the path given
+def generateTemplateFile(template, path):
+  copyfile('.templates/' + template, path)
+
+# Generate an input file from the template
+def generateInputFile(path):
+  generateTemplateFile('input_file_template.txt', path)
+
+# Generate an output file from the template
+def generateOutputFile(path):
+  generateTemplateFile('output_file_template.txt', path)
 
 # Transform the input file table format into matrixes 'x' and 'd'
 def extractXD(tableLines):
@@ -60,7 +68,11 @@ def extractXD(tableLines):
 # Transform the output file table format into matrix 'x2'
 def extractX2(tableLines):
   x2 = list()
-  x2.append([l.strip().split(' ') for l in tableLines])
+  for row in [l.strip().split(' ') for l in tableLines]:
+    x2Temp = list()
+    for value in row:
+      x2Temp.append(bool(int(value)))
+    x2.append(x2Temp)
   return x2
 
 # Read lines of a plain text file with # as comment lines, ignoring empty lines
@@ -100,6 +112,12 @@ def main(argv):
     validateMandatoryParameters(['f'], parameters,
       '--input needs parameter -f for the generated input file\'s name')
     generateInputFile(parameters['f'])
+
+  # Command OUTPUT
+  elif command == '--output':
+    validateMandatoryParameters(['f'], parameters,
+      '--output needs parameter -f for the generated output file\'s name')
+    generateOutputFile(parameters['f'])
 
   # Command LEARN
   elif command == '--learn':

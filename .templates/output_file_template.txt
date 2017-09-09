@@ -1,0 +1,14 @@
+# Override this file with your desired output values. You can delete the
+# comments, but it is important to only left the table lines without a "#" at
+# the beginning.
+
+# Fill the output table following the example, where:
+# - n: number of inputs
+# - r: number of desired results
+
+# It is important to put a space between values. Inputs should be binary values
+# (0, 1).
+
+x(0,0) ... x(n,0)
+...    ... ...
+x(0,r) ... x(n,r)

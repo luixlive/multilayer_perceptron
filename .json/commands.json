@@ -9,6 +9,11 @@
     "params": ["-f: File name"],
     "optionalParams": []
   },
+  "output": {
+    "definition": "Create an output template.",
+    "params": ["-f: File name"],
+    "optionalParams": []
+  },
   "learn": {
     "definition": "Learning process (calculation of weights).",
     "params": [
