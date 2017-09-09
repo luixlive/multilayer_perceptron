@@ -9,12 +9,20 @@
     "params": ["-f: File name"],
     "optionalParams": []
   },
-  "run": {
-    "definition": "Get all solutions using multilayer perceptron.",
-    "params": ["-i: Input file path"],
+  "learn": {
+    "definition": "Learning process (calculation of weights).",
+    "params": [
+      "-i: Input file path",
+       "-w: Learned weights file (this file will be automatically created)"
+    ],
     "optionalParams": [
-      "-a: Alpha value (0.3)",
-      "-m: Max error value (0.00001)"
+      "-a: Alpha value (default: 0.3)",
+      "-m: Max error value (default: 0.00001)"
     ]
+  },
+  "run": {
+    "definition": "Run a a multilayer perceptron given desired outputs",
+    "params": ["-w: Learned weigth file"],
+    "optionalParams": ["-o: Output file path"]
   }
 }
