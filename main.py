@@ -6,6 +6,13 @@ from json import loads, dumps
 from shutil import copyfile
 from multilayer_perceptron import learningProcess, getY2
 
+# Constants
+COMMAND_HELP = '--help'
+COMMAND_INPUT = '--input'
+COMMAND_OUTPUT = '--output'
+COMMAND_LEARN = '--learn'
+COMMAND_RUN = '--run'
+
 # Capture dynamic parameters
 def getDynamicParameters(parameters):
   parametersDict = dict()
@@ -91,6 +98,60 @@ def readInputFile(inputFilePath):
 def readOutputFile(outputFilePath):
   return extractX2(readTableFile(outputFilePath))
 
+# Run command help
+def runCommandHelp(parameters):
+  commandsFile = open('.json/commands.json', 'r')
+  showHelp(loads(commandsFile.read()))
+  commandsFile.close()
+
+# Run command input
+def runCommandInput(parameters):
+  validateMandatoryParameters(['f'], parameters,
+    '--input needs parameter -f for the generated input file\'s name')
+  generateInputFile(parameters['f'])
+
+# Run command output
+def runCommandOutput(parameters):
+  validateMandatoryParameters(['f'], parameters,
+    '--output needs parameter -f for the generated output file\'s name')
+  generateOutputFile(parameters['f'])
+
+# Run command learn
+def runCommandLearn(parameters):
+  validateMandatoryParameters(['i', 'w'], parameters,
+    '--learn needs parameters -i and -w to get inputs and save learning')
+  constants_file = open('.json/constants.json', 'r')
+  constants = loads(constants_file.read())
+  constants_file.close()
+
+  (x, d) = readInputFile(parameters['i'])
+  alpha = constants['alpha']
+  maxError = constants['maxError']
+  if 'a' in parameters:
+    alpha = float(parameters['a'])
+  if 'm' in parameters:
+    maxError = float(parameters['m'])
+
+  learningFile = open(parameters['w'], 'w')
+  learningFile.write(dumps(learningProcess(x, d, alpha, maxError)))
+  learningFile.close()
+
+# Run command run
+def runCommandRun(parameters):
+  validateMandatoryParameters(['w'], parameters,
+    '--run needs parameter -o to get learned weights')
+  learningFile = open(parameters['w'], 'r')
+  (n, m, l, wh, wo) = loads(learningFile.read())
+  learningFile.close()
+
+  x2 = []
+  if 'o' in parameters:
+    x2 = readOutputFile(parameters['o'])
+  else:
+    x2 = list(product([False, True], repeat=n))
+
+  print '\n'.join([r for r in getY2(x2, n, m, l, wh, wo, True)])
+
 # Main function, receives the input arguments and determines the code to run
 def main(argv):
   if len(argv) == 0:
@@ -101,59 +162,13 @@ def main(argv):
   if len(argv) > 1:
     parameters = getDynamicParameters(argv[1:])
 
-  # Command HELP
-  if command == '--help':
-    commandsFile = open('.json/commands.json', 'r')
-    showHelp(loads(commandsFile.read()))
-    commandsFile.close()
-
-  # Command INPUT
-  elif command == '--input':
-    validateMandatoryParameters(['f'], parameters,
-      '--input needs parameter -f for the generated input file\'s name')
-    generateInputFile(parameters['f'])
-
-  # Command OUTPUT
-  elif command == '--output':
-    validateMandatoryParameters(['f'], parameters,
-      '--output needs parameter -f for the generated output file\'s name')
-    generateOutputFile(parameters['f'])
-
-  # Command LEARN
-  elif command == '--learn':
-    validateMandatoryParameters(['i', 'w'], parameters,
-      '--learn needs parameters -i and -w to get inputs and save learning')
-    constants_file = open('.json/constants.json', 'r')
-    constants = loads(constants_file.read())
-    constants_file.close()
-
-    (x, d) = readInputFile(parameters['i'])
-    alpha = constants['alpha']
-    maxError = constants['maxError']
-    if 'a' in parameters:
-      alpha = float(parameters['a'])
-    if 'm' in parameters:
-      maxError = float(parameters['m'])
-
-    learningFile = open(parameters['w'], 'w')
-    learningFile.write(dumps(learningProcess(x, d, alpha, maxError)))
-    learningFile.close()
-
-  # Command RUN
-  elif command == '--run':
-    validateMandatoryParameters(['w'], parameters,
-      '--run needs parameter -o to get learned weights')
-    learningFile = open(parameters['w'], 'r')
-    (n, m, l, wh, wo) = loads(learningFile.read())
-    learningFile.close()
-
-    x2 = []
-    if 'o' in parameters:
-      x2 = readOutputFile(parameters['o'])
-    else:
-      x2 = list(product([False, True], repeat=n))
-
-    print '\n'.join([r for r in getY2(x2, n, m, l, wh, wo, True)])
+  {
+    COMMAND_HELP: runCommandHelp,
+    COMMAND_INPUT: runCommandInput,
+    COMMAND_OUTPUT: runCommandOutput,
+    COMMAND_LEARN: runCommandLearn,
+    COMMAND_RUN: runCommandRun
+  }[command](parameters)
 
 
 if __name__ == "__main__":
