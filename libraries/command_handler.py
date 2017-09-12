@@ -139,7 +139,14 @@ def _runCommandRun(parameters):
   else:
     x2 = list(product([False, True], repeat=n))
 
-  print '\n'.join([r for r in getY2(x2, n, m, l, wh, wo, True)])
+  results = '\n'.join([r for r in getY2(x2, n, m, l, wh, wo, True)])
+
+  if 's' in parameters:
+    learningFile = open(parameters['s'], 'w')
+    learningFile.write(results)
+    learningFile.close()
+  else:
+    print results
 
 # Map received command with it's function
 def runCommand(command, parameters):

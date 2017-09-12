@@ -28,6 +28,9 @@
   "run": {
     "definition": "Run a a multilayer perceptron given desired outputs",
     "params": ["-w: Learned weigth file"],
-    "optionalParams": ["-o: Output file path"]
+    "optionalParams": [
+      "-o: Output file path",
+      "-s: Save results file path"
+    ]
   }
 }
