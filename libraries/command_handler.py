@@ -143,6 +143,8 @@ def _runCommandRun(parameters):
 
   if 's' in parameters:
     learningFile = open(parameters['s'], 'w')
+    learningFile.write('# Requested results running ' + parameters['w'] + \
+      ' network\n')
     learningFile.write(results)
     learningFile.close()
   else:
