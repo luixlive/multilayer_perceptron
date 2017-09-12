@@ -43,6 +43,9 @@ EXAMPLE OF USAGE:
     'python main.py --run -w=learning_file_path.json'
     You can use the optional output param to only print your desired values:
     '-o=output_file_path.txt'
+    Also, there is an optional param to save the results in a file instead of
+    printing them in terminal:
+    '-s=save_results_here.txt'
 
   - Check the results in the output
 
