@@ -4,11 +4,23 @@ from shutil import copyfile
 from multilayer_perceptron import learningProcess, getY2
 
 # Constants
-COMMAND_HELP = '--help'
-COMMAND_INPUT = '--input'
-COMMAND_OUTPUT = '--output'
-COMMAND_LEARN = '--learn'
-COMMAND_RUN = '--run'
+CMD_HELP = '--help'
+CMD_INPUT = '--input'
+CMD_LEARN = '--learn'
+CMD_OUTPUT = '--output'
+CMD_RUN = '--run'
+
+CONST_ALPHA = 'alpha'
+CONST_MAX_ERR = 'maxError'
+
+PARAM_ALPHA = 'a'
+PARAM_FILE = 'f'
+PARAM_INPUT = 'i'
+PARAM_MAX_ERR = 'm'
+PARAM_OUTPUT = 'o'
+PARAM_ROUND = 'r'
+PARAM_SAVE = 's'
+PARAM_WEIGHTS = 'w'
 
 # Validate that user's input params have the required ones
 def _validateMandatoryParameters(mandatoryParams, inputParams, message):
@@ -95,67 +107,68 @@ def _runCommandHelp(parameters):
 
 # Run command input
 def _runCommandInput(parameters):
-  _validateMandatoryParameters(['f'], parameters,
+  _validateMandatoryParameters([PARAM_FILE], parameters,
     '--input needs parameter -f for the generated input file\'s name')
-  _generateInputFile(parameters['f'])
+  _generateInputFile(parameters[PARAM_FILE])
 
 # Run command output
 def _runCommandOutput(parameters):
-  _validateMandatoryParameters(['f'], parameters,
+  _validateMandatoryParameters([PARAM_FILE], parameters,
     '--output needs parameter -f for the generated output file\'s name')
-  _generateOutputFile(parameters['f'])
+  _generateOutputFile(parameters[PARAM_FILE])
 
 # Run command learn
 def _runCommandLearn(parameters):
-  _validateMandatoryParameters(['i', 'w'], parameters,
+  _validateMandatoryParameters([PARAM_INPUT, PARAM_WEIGHTS], parameters,
     '--learn needs parameters -i and -w to get inputs and save learning')
   constants_file = open('.json/constants.json', 'r')
   constants = loads(constants_file.read())
   constants_file.close()
 
-  (x, d) = _readInputFile(parameters['i'])
-  alpha = constants['alpha']
-  maxError = constants['maxError']
-  if 'a' in parameters:
-    alpha = float(parameters['a'])
-  if 'm' in parameters:
-    maxError = float(parameters['m'])
+  (x, d) = _readInputFile(parameters[PARAM_INPUT])
+  alpha = constants[CONST_ALPHA]
+  maxError = constants[CONST_MAX_ERR]
+  if PARAM_ALPHA in parameters:
+    alpha = float(parameters[PARAM_ALPHA])
+  if PARAM_MAX_ERR in parameters:
+    maxError = float(parameters[PARAM_WEIGHTS])
 
-  learningFile = open(parameters['w'], 'w')
+  learningFile = open(parameters[PARAM_WEIGHTS], 'w')
   learningFile.write(dumps(learningProcess(x, d, alpha, maxError)))
   learningFile.close()
 
 # Run command run
 def _runCommandRun(parameters):
-  _validateMandatoryParameters(['w'], parameters,
+  _validateMandatoryParameters([PARAM_WEIGHTS], parameters,
     '--run needs parameter -o to get learned weights')
-  learningFile = open(parameters['w'], 'r')
+  learningFile = open(parameters[PARAM_WEIGHTS], 'r')
   (n, m, l, wh, wo) = loads(learningFile.read())
   learningFile.close()
 
   x2 = []
-  if 'o' in parameters:
-    x2 = _readOutputFile(parameters['o'])
+  if PARAM_OUTPUT in parameters:
+    x2 = _readOutputFile(parameters[PARAM_OUTPUT])
   else:
     x2 = list(product([False, True], repeat=n))
 
-  results = '\n'.join([r for r in getY2(x2, n, m, l, wh, wo, True)])
+  results = getY2(x2, n, m, l, wh, wo, PARAM_ROUND in parameters, True)
+  resultString = '\n'.join([r for r in results])
 
-  if 's' in parameters:
-    learningFile = open(parameters['s'], 'w')
-    learningFile.write('# Requested results running ' + parameters['w'] + \
-      ' network\n')
-    learningFile.write(results)
+  if PARAM_SAVE in parameters:
+    learningFile = open(parameters[PARAM_SAVE], 'w')
+    learningFile.write('# Requested results running ' + \
+      parameters[PARAM_WEIGHTS] + ' network\n')
+    learningFile.write(resultString)
     learningFile.close()
   else:
-    print results
+    print resultString
 
 # Map received command with it's function
 def runCommand(command, parameters):
   {
-    COMMAND_HELP: _runCommandHelp,
-    COMMAND_INPUT: _runCommandInput,
-    COMMAND_OUTPUT: _runCommandOutput,
-    COMMAND_LEARN: _runCommandLearn,
-    COMMAND_RUN: _runCommandRun
+    CMD_HELP: _runCommandHelp,
+    CMD_INPUT: _runCommandInput,
+    CMD_OUTPUT: _runCommandOutput,
+    CMD_LEARN: _runCommandLearn,
+    CMD_RUN: _runCommandRun
   }[command](parameters)

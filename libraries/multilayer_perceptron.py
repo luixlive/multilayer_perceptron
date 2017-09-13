@@ -51,9 +51,10 @@ def _activationFunction(net):
 def _getYh(x, wh, n, p, l):
   return [_activationFunction(_getNeth(x, wh, n, p, j)) for j in range(l)]
 
-# Calculate the 'y' of a learning pattern given its 'y h' and weights
-def _getY(yh, wo, l, m):
-  return [_activationFunction(_getNeto(yh, wo, l, k)) for k in range(m)]
+# Calculate the 'y' of a learning pattern, can round with rnd
+def _getY(yh, wo, l, m, rnd = False):
+  y = [_activationFunction(_getNeto(yh, wo, l, k)) for k in range(m)]
+  return y if not rnd else [int(round(v)) for v in y]
 
 # Calculate the correct weigths to pass all learning patterns
 def learningProcess(x, d, alpha, maxError):
@@ -83,7 +84,7 @@ def _toString(x2, y2):
   return [' '.join([str(int(b)) for b in x2[p]]) +
     ' | ' + ' '.join([str(v) for v in r]) for p, r in zip(range(len(x2)), y2)]
 
-# Calculate 'y2' given 'x2', 'wh', 'wo' and all the lengths
-def getY2(x2, n, m, l, wh, wo, string = False):
-  y2 = [_getY(_getYh(x2, wh, n, p, l), wo, l, m) for p in range(len(x2))]
-  return _toString(x2, y2) if string else y2
+# Calculate 'y2' given all params, can round and stringify
+def getY2(x2, n, m, l, wh, wo, rnd = False, toStr = False):
+  y2 = [_getY(_getYh(x2, wh, n, p, l), wo, l, m, rnd) for p in range(len(x2))]
+  return _toString(x2, y2) if toStr else y2
