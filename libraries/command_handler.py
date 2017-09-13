@@ -131,7 +131,7 @@ def _runCommandLearn(parameters):
   if PARAM_ALPHA in parameters:
     alpha = float(parameters[PARAM_ALPHA])
   if PARAM_MAX_ERR in parameters:
-    maxError = float(parameters[PARAM_WEIGHTS])
+    maxError = float(parameters[PARAM_MAX_ERR])
 
   learningFile = open(parameters[PARAM_WEIGHTS], 'w')
   learningFile.write(dumps(learningProcess(x, d, alpha, maxError)))
