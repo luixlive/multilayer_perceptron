@@ -39,6 +39,8 @@ EXAMPLE OF USAGE:
     Example:
       1 0
 
+  - Optionally add parameter -r to round results to binary values
+
   - Run the multilayer perceptron:
     'python main.py --run -w=learning_file_path.json'
     You can use the optional output param to only print your desired values:
