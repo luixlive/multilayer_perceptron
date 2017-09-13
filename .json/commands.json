@@ -30,6 +30,7 @@
     "params": ["-w: Learned weigth file"],
     "optionalParams": [
       "-o: Output file path",
+      "-r: Round to binary results",
       "-s: Save results file path"
     ]
   }
