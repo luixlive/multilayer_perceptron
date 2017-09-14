@@ -1,31 +1,27 @@
+from constants import *
 from itertools import product
 from json import loads, dumps
 from shutil import copyfile
 from multilayer_perceptron import learningProcess, getY2
 
-# Constants
-CMD_HELP = '--help'
-CMD_INPUT = '--input'
-CMD_LEARN = '--learn'
-CMD_OUTPUT = '--output'
-CMD_RUN = '--run'
+# Assertion, if the validation is false prints the message and end program
+def _assert(validation, message):
+  if not validation:
+    print message
+    quit()
 
-CONST_ALPHA = 'alpha'
-CONST_MAX_ERR = 'maxError'
-
-PARAM_ALPHA = 'a'
-PARAM_FILE = 'f'
-PARAM_INPUT = 'i'
-PARAM_MAX_ERR = 'm'
-PARAM_OUTPUT = 'o'
-PARAM_ROUND = 'r'
-PARAM_SAVE = 's'
-PARAM_WEIGHTS = 'w'
+# Capture dynamic parameters
+def _getDynamicParameters(parameters):
+  parametersDict = dict()
+  for k, v in [p.split('=') if '=' in p else [p, True] for p in parameters]:
+    _assert(k[0] == '-' and len(k) == 2, 'ERROR: Wrong param ' + k)
+    parametersDict[k[1:]] = v
+  return parametersDict
 
 # Validate that user's input params have the required ones
 def _validateMandatoryParameters(mandatoryParams, inputParams, message):
   for param in mandatoryParams:
-    assert param in inputParams, message
+    _assert(param in inputParams, message)
 
 # Print all commands in output
 def _showHelp(commands):
@@ -54,22 +50,10 @@ def _generateOutputFile(path):
 def _extractXD(tableLines):
   x = list()
   d = list()
-  rowCount = 0
   for row in [l.strip().split(' ') for l in tableLines]:
-    xTemp = list()
-    dTemp = list()
-    inputs = True
-    for value in row:
-      if value == '|':
-        inputs = False
-      elif inputs:
-        xTemp.append(bool(int(value)))
-      else:
-        dTemp.append(float(value))
-    x.append(tuple(xTemp))
-    d.append(tuple(dTemp))
-
-    rowCount += 1
+    indexSeparator = row.index('|')
+    x.append([bool(int(v)) for v in row[:indexSeparator]])
+    d.append([float(v) for v in row[indexSeparator + 1:]])
 
   return (x, d)
 
@@ -77,10 +61,7 @@ def _extractXD(tableLines):
 def _extractX2(tableLines):
   x2 = list()
   for row in [l.strip().split(' ') for l in tableLines]:
-    x2Temp = list()
-    for value in row:
-      x2Temp.append(bool(int(value)))
-    x2.append(x2Temp)
+    x2.append([bool(int(v)) for v in row])
   return x2
 
 # Read lines of a plain text file with # as comment lines, ignoring empty lines
@@ -126,12 +107,10 @@ def _runCommandLearn(parameters):
   constants_file.close()
 
   (x, d) = _readInputFile(parameters[PARAM_INPUT])
-  alpha = constants[CONST_ALPHA]
-  maxError = constants[CONST_MAX_ERR]
-  if PARAM_ALPHA in parameters:
-    alpha = float(parameters[PARAM_ALPHA])
-  if PARAM_MAX_ERR in parameters:
-    maxError = float(parameters[PARAM_MAX_ERR])
+  alpha = float(parameters[PARAM_ALPHA]) if PARAM_ALPHA in parameters \
+    else constants[CONST_ALPHA]
+  maxError = float(parameters[PARAM_MAX_ERR]) if PARAM_MAX_ERR in parameters \
+    else constants[CONST_MAX_ERR]
 
   learningFile = open(parameters[PARAM_WEIGHTS], 'w')
   learningFile.write(dumps(learningProcess(x, d, alpha, maxError)))
@@ -145,11 +124,8 @@ def _runCommandRun(parameters):
   (n, m, l, wh, wo) = loads(learningFile.read())
   learningFile.close()
 
-  x2 = []
-  if PARAM_OUTPUT in parameters:
-    x2 = _readOutputFile(parameters[PARAM_OUTPUT])
-  else:
-    x2 = list(product([False, True], repeat=n))
+  x2 = _readOutputFile(parameters[PARAM_OUTPUT]) if PARAM_OUTPUT in \
+    parameters else list(product([False, True], repeat=n))
 
   results = getY2(x2, n, m, l, wh, wo, PARAM_ROUND in parameters, True)
   resultString = '\n'.join([r for r in results])
@@ -157,18 +133,17 @@ def _runCommandRun(parameters):
   if PARAM_SAVE in parameters:
     learningFile = open(parameters[PARAM_SAVE], 'w')
     learningFile.write('# Requested results running ' + \
-      parameters[PARAM_WEIGHTS] + ' network\n')
-    learningFile.write(resultString)
+      parameters[PARAM_WEIGHTS] + ' network\n' + resultString)
     learningFile.close()
   else:
     print resultString
 
 # Map received command with it's function
-def runCommand(command, parameters):
+def runCommand(argv):
   {
     CMD_HELP: _runCommandHelp,
     CMD_INPUT: _runCommandInput,
     CMD_OUTPUT: _runCommandOutput,
     CMD_LEARN: _runCommandLearn,
     CMD_RUN: _runCommandRun
-  }[command](parameters)
+  }[argv[0]](_getDynamicParameters(argv[1:]))
