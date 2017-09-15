@@ -119,7 +119,7 @@ def _runCommandLearn(parameters):
 # Run command run
 def _runCommandRun(parameters):
   _validateMandatoryParameters([PARAM_WEIGHTS], parameters,
-    '--run needs parameter -o to get learned weights')
+    '--run needs parameter -w to get learned weights')
   learningFile = open(parameters[PARAM_WEIGHTS], 'r')
   (n, m, l, wh, wo) = loads(learningFile.read())
   learningFile.close()
