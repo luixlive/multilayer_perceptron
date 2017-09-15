@@ -69,13 +69,11 @@ def learningProcess(x, d, alpha, maxError):
     for p in range(len(x)):
       yh = _getYh(x, wh, n, p, l)
       deltao = [_getDeltao(d, _getY(yh, wo, l, m), k, p) for k in range(m)]
+      deltah = [_getDeltah(yh, deltao, wo, m, j) for j in range(l)]
+      wo = _adjustWo(alpha, deltao, yh, m, l, wo)
+      wh = _adjustWh(alpha, deltah, x, l, n, p, wh)
 
-      if _getError(deltao, m) > maxError:
-        deltah = [_getDeltah(yh, deltao, wo, m, j) for j in range(l)]
-        wo = _adjustWo(alpha, deltao, yh, m, l, wo)
-        wh = _adjustWh(alpha, deltah, x, l, n, p, wh)
-
-        error = True
+      error = _getError(deltao, m) > maxError or error
 
   return (n, m, l, wh, wo)
 
