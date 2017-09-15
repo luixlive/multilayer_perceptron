@@ -59,10 +59,7 @@ def _extractXD(tableLines):
 
 # Transform the output file table format into matrix 'x2'
 def _extractX2(tableLines):
-  x2 = list()
-  for row in [l.strip().split(' ') for l in tableLines]:
-    x2.append([bool(int(v)) for v in row])
-  return x2
+  return [[bool(int(v)) for v in l.strip().split(' ')] for l in tableLines]
 
 # Read lines of a plain text file with # as comment lines, ignoring empty lines
 def _readTableFile(tableFilePath):
